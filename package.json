@@ -1,7 +1,7 @@
 {
     "ava": {
         "files": [
-            "bin/**/*.test.mjs"
+            "lib/**/*.test.js"
         ]
     },
     "name": "async-tools",

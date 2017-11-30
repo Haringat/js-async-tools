@@ -78,6 +78,10 @@ const options = {
         get declarationsDist() {
             "use strict";
             return ".";
+        },
+        get lint() {
+            "use strict";
+            return this.tsSources.concat("!**/*.d.ts");
         }
     },
     rename: {
@@ -98,7 +102,7 @@ const options = {
 
 const es6TsConfig = {
     ...tsConfig.compilerOptions,
-    target: "es6",
+    target: "es2016",
     module: "es6",
     typescript: typescript
 };
@@ -124,16 +128,16 @@ gulp.task("test", ["build"], () => {
 
 gulp.task("lint", () => {
     "use strict";
-    return gulp.src(options.paths.tsSources, {
+    return gulp.src(options.paths.lint, {
         base: options.paths.libRoot
     })
         .pipe(gulpPlumber())
-        /*.pipe(gulpTsLint({
+        .pipe(gulpTsLint({
             configuration: "./tslint.json"
         }))
         .pipe(gulpTsLint.report({
             summarizeFailureOutput: true
-        }))*/
+        }))
         .pipe(gulpPlumber.stop());
 });
 

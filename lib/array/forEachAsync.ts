@@ -1,7 +1,9 @@
 declare global {
-    // noinspection TsLint (built-in type)
     interface Array<T> {
-        forEachAsync<S>(iterator: (this: S, value: T, index: number, array: this) => Promise<void>, thisArg?: S): Promise<void>;
+        forEachAsync<S>(
+            iterator: (this: S, value: T, index: number, array: this) => Promise<void>,
+            thisArg?: S
+        ): Promise<void>;
     }
 }
 

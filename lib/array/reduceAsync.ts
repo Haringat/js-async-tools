@@ -1,8 +1,12 @@
 declare global {
-    // noinspection TsLint (built-in type)
     interface Array<T> {
-        reduceAsync(callback: (accumulator: T, currentValue: T, currentIndex: number, array: Array<T>) => Promise<T>): Promise<T>;
-        reduceAsync<U>(callback: (accumulator: U, currentValue: T, currentIndex: number, array: Array<T>) => Promise<U>, initialValue?: U): Promise<U>;
+        reduceAsync(
+            callback: (accumulator: T, currentValue: T, currentIndex: number, array: Array<T>) => Promise<T>
+        ): Promise<T>;
+        reduceAsync<U>(
+            callback: (accumulator: U, currentValue: T, currentIndex: number, array: Array<T>) => Promise<U>,
+            initialValue?: U
+        ): Promise<U>;
     }
 }
 

@@ -28,7 +28,8 @@
             true,
             "generic"
         ],
-        "no-console": [false]
+        "no-console": [false],
+        "interface-name": [true, "never-prefix"]
     },
     "rulesDirectory": []
 }

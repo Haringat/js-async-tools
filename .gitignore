@@ -569,10 +569,8 @@ flycheck_*.el
 .dir-locals.el
 
 # build outputs
-bin
-bin6
 *.iml
-lib
 *.mjs
 *.js
+!gulpfile.js
 *.d.ts

@@ -1,2 +1,6 @@
-export * from "./array";
-export * from "./delay";
+import "./array";
+import delay from "./delay";
+
+export {
+    delay
+};
