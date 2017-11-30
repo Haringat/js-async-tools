@@ -1,6 +1,7 @@
 const gulp = require("gulp");
 const gulpAva = require("gulp-ava");
 const gulpClean = require("gulp-clean");
+const gulpFilter = require("gulp-filter");
 const gulpPlumber = require("gulp-plumber");
 const gulpRename = require("gulp-rename");
 const {
@@ -9,6 +10,8 @@ const {
 } = require("gulp-sourcemaps");
 const gulpTsLint = require("gulp-tslint");
 const gulpTypescript = require("gulp-typescript");
+
+const merge = require("merge2");
 
 const typescript = require("typescript");
 const tslint = require("tslint");
@@ -41,36 +44,40 @@ import tsConfig from "json!./tsconfig.json";*/
 
 const options = {
     paths: {
-        get srcRoot() {
+        get libRoot() {
             "use strict";
-            return "./src/";
+            return "./";
         },
         get tsSources() {
             "use strict";
-            return ["/**/*.ts"].map(path => {
-                return normalize(this.srcRoot + path)
+            return ["index.ts", "/lib/**/*.ts"].map(path => {
+                return normalize(this.libRoot + path)
             });
-        },
-        get es5Dist() {
-            "use strict";
-            return "./bin";
-        },
-        get es6Dist() {
-            "use strict";
-            return "./bin6";
         },
         get testSources() {
             "use strict";
             return ["/**/*.spec.js"].map(path => {
-                return normalize(this.es5Dist + path)
+                return normalize(this.scriptsDist + path)
             });
         },
-        get dists() {
+        get binaries() {
             "use strict";
             return [
-                this.es5Dist,
-                this.es6Dist
+                "index.js",
+                "index.mjs",
+                "index.d.ts",
+                "lib/**/*.js",
+                "lib/**/*.mjs",
+                "lib/**/*.d.ts"
             ];
+        },
+        get scriptsDist() {
+            "use strict";
+            return ".";
+        },
+        get declarationsDist() {
+            "use strict";
+            return ".";
         }
     },
     rename: {
@@ -118,7 +125,7 @@ gulp.task("test", ["build"], () => {
 gulp.task("lint", () => {
     "use strict";
     return gulp.src(options.paths.tsSources, {
-        base: options.paths.srcRoot
+        base: options.paths.libRoot
     })
         .pipe(gulpPlumber())
         /*.pipe(gulpTsLint({
@@ -134,35 +141,51 @@ gulp.task("build", ["build-es5", "build-es6"]);
 
 gulp.task("build-es5", ["lint"], () => {
     "use strict";
-    return gulp.src(options.paths.tsSources, {
-        base: options.paths.srcRoot
+    const ts = gulp.src(options.paths.tsSources, {
+        base: options.paths.libRoot
     })
         .pipe(gulpPlumber())
         .pipe(initSourceMaps())
-        .pipe(gulpTypescript(es5TsConfig))
+        .pipe(gulpTypescript(es5TsConfig));
+
+    const js = ts.js
         .pipe(gulpRename(options.rename.es5Scripts))
         .pipe(writeSourceMaps())
         .pipe(gulpPlumber.stop())
-        .pipe(gulp.dest(options.paths.es5Dist));
+        .pipe(gulp.dest(options.paths.scriptsDist));
+
+    const dts = ts.dts
+        .pipe(gulpFilter(["**", "!**/*.test.d.ts"]))
+        .pipe(gulp.dest(options.paths.declarationsDist));
+
+    return merge([js, dts]);
 });
 
 gulp.task("build-es6", ["lint"], () => {
     "use strict";
-    return gulp.src(options.paths.tsSources, {
-        base: options.paths.srcRoot
+    const ts = gulp.src(options.paths.tsSources, {
+        base: options.paths.libRoot
     })
         .pipe(gulpPlumber())
         .pipe(initSourceMaps())
-        .pipe(gulpTypescript(es6TsConfig))
+        .pipe(gulpTypescript(es6TsConfig));
+
+    const js = ts.js
         .pipe(gulpRename(options.rename.es6Scripts))
         .pipe(writeSourceMaps())
         .pipe(gulpPlumber.stop())
-        .pipe(gulp.dest(options.paths.es6Dist));
+        .pipe(gulp.dest(options.paths.scriptsDist));
+
+    const dts = ts.dts
+        .pipe(gulpFilter(["**", "!**/*.test.d.ts"]))
+        .pipe(gulp.dest(options.paths.declarationsDist));
+
+    return merge([js, dts]);
 });
 
 gulp.task("clean", () => {
     "use strict";
-    return gulp.src(options.paths.dists, {
+    return gulp.src(options.paths.binaries, {
         read: false
     })
         .pipe(gulpClean());

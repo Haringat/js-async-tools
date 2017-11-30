@@ -572,3 +572,7 @@ flycheck_*.el
 bin
 bin6
 *.iml
+lib
+*.mjs
+*.js
+*.d.ts
